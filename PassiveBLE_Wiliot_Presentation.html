@@ -3,840 +3,398 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>PassiveBLE × Wiliot: From Research Paper to Product Simulation</title>
+<title>PassiveBLE x Wiliot: From Paper to Product Simulation</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #0a0e1a; color: #e2e8f0; }
-.slides-container { display: flex; height: 100vh; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-.slide { min-width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: clamp(24px, 5vw, 80px); position: relative; overflow: hidden; }
-
-/* Slide themes */
-.slide-title { background: linear-gradient(135deg, #0a0e1a 0%, #1a1040 50%, #0f2040 100%); }
-.slide-dark { background: linear-gradient(180deg, #0d1117 0%, #161b22 100%); }
-.slide-blue { background: linear-gradient(135deg, #0c1929 0%, #0f2847 60%, #0a1628 100%); }
-.slide-green { background: linear-gradient(135deg, #0a1a14 0%, #0f2e1f 60%, #081a10 100%); }
-.slide-purple { background: linear-gradient(135deg, #150d24 0%, #1f1040 60%, #120a20 100%); }
-.slide-orange { background: linear-gradient(135deg, #1a1008 0%, #2a1a0a 60%, #1a0f06 100%); }
-.slide-final { background: linear-gradient(135deg, #0a0e1a 0%, #1a1040 40%, #0a2040 70%, #0a1a14 100%); }
-
-.slide-content { max-width: 1100px; width: 100%; z-index: 1; }
-
-/* Typography */
-h1 { font-size: clamp(28px, 4.5vw, 64px); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
-h2 { font-size: clamp(22px, 3vw, 44px); font-weight: 700; line-height: 1.2; margin-bottom: 20px; }
-h3 { font-size: clamp(16px, 2vw, 28px); font-weight: 600; margin-bottom: 12px; }
-p, li { font-size: clamp(13px, 1.4vw, 20px); line-height: 1.7; color: #b0bec5; }
-.subtitle { font-size: clamp(14px, 1.6vw, 24px); color: #64b5f6; font-weight: 400; margin-bottom: 24px; }
-.tag { display: inline-block; padding: 4px 14px; border-radius: 20px; font-size: clamp(10px, 1vw, 14px); font-weight: 600; margin: 3px; }
-.tag-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-.tag-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.tag-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
-.tag-orange { background: rgba(251, 146, 60, 0.2); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.3); }
-.tag-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-
-.accent { color: #60a5fa; }
-.accent-green { color: #4ade80; }
-.accent-purple { color: #c084fc; }
-.accent-orange { color: #fb923c; }
-.accent-cyan { color: #22d3ee; }
-
-/* Grids */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 20px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 20px; }
-.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 20px; }
-@media (max-width: 768px) {
-  .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
-}
-
-/* Cards */
-.card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: clamp(16px, 2vw, 28px); }
-.card-highlight { border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.06); }
-.card-green { border-color: rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.06); }
-.card-purple { border-color: rgba(168, 85, 247, 0.4); background: rgba(168, 85, 247, 0.06); }
-.card-orange { border-color: rgba(251, 146, 60, 0.4); background: rgba(251, 146, 60, 0.06); }
-
-/* Big numbers */
-.big-num { font-size: clamp(32px, 5vw, 72px); font-weight: 900; line-height: 1; }
-.metric-label { font-size: clamp(11px, 1vw, 15px); color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
-
-/* Flow */
-.flow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
-.flow-step { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 18px; text-align: center; font-size: clamp(11px, 1.1vw, 16px); font-weight: 500; }
-.flow-arrow { color: #60a5fa; font-size: 20px; font-weight: 700; }
-
-/* Table */
-.data-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: clamp(11px, 1.1vw, 16px); }
-.data-table th { background: rgba(59, 130, 246, 0.15); color: #60a5fa; padding: 10px 14px; text-align: left; font-weight: 600; border-bottom: 2px solid rgba(59, 130, 246, 0.3); }
-.data-table td { padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); }
-.data-table tr:hover td { background: rgba(255,255,255,0.03); }
-.check { color: #4ade80; font-weight: 700; }
-
-/* List */
-ul { list-style: none; padding: 0; }
-ul li { padding: 6px 0; padding-left: 24px; position: relative; }
-ul li::before { content: '▸'; position: absolute; left: 0; color: #60a5fa; font-weight: 700; }
-ul.green li::before { color: #4ade80; }
-ul.purple li::before { color: #c084fc; }
-ul.orange li::before { color: #fb923c; }
-
-/* Process step numbers */
-.step-num { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff; font-weight: 800; font-size: 16px; margin-right: 12px; flex-shrink: 0; }
-.step-row { display: flex; align-items: flex-start; margin-bottom: 14px; }
-.step-text { flex: 1; }
-
-/* Decorative elements */
-.glow-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15; pointer-events: none; }
-.glow-blue { background: #3b82f6; }
-.glow-green { background: #22c55e; }
-.glow-purple { background: #a855f7; }
-
-/* Navigation */
-.nav-btn { position: fixed; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.15); background: rgba(10,14,26,0.8); color: #94a3b8; font-size: 22px; cursor: pointer; z-index: 100; display: flex; align-items: center; justify-content: center; transition: all 0.2s; backdrop-filter: blur(8px); }
-.nav-btn:hover { background: rgba(59, 130, 246, 0.3); color: #fff; border-color: rgba(59, 130, 246, 0.5); }
-.nav-prev { left: 16px; }
-.nav-next { right: 16px; }
-
-/* Progress bar */
-.progress-bar { position: fixed; bottom: 0; left: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #22d3ee, #a855f7); transition: width 0.4s ease; z-index: 100; }
-
-/* Slide counter */
-.slide-counter { position: fixed; bottom: 12px; right: 20px; font-size: 13px; color: #475569; z-index: 100; font-weight: 500; }
-
-/* Swipe hint */
-.swipe-hint { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); color: #475569; font-size: 14px; z-index: 100; animation: hintPulse 2s ease-in-out infinite; transition: opacity 0.5s; }
-@keyframes hintPulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
-
-/* Separator */
-.sep { width: 60px; height: 4px; background: linear-gradient(90deg, #3b82f6, #22d3ee); border-radius: 2px; margin: 16px 0; }
-
-/* Paper card */
-.paper-card { display: flex; gap: 16px; align-items: flex-start; }
-.paper-num { font-size: clamp(24px, 3vw, 42px); font-weight: 900; color: rgba(59, 130, 246, 0.3); line-height: 1; min-width: 40px; }
-
-/* Winner badge */
-.winner { position: relative; }
-.winner::after { content: '★ HERO DEMO'; position: absolute; top: -10px; right: -10px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 12px; }
-
-/* Fade-in sections */
-.fade-group > * { opacity: 0; transform: translateY(20px); animation: fadeUp 0.5s ease forwards; }
-.fade-group > *:nth-child(1) { animation-delay: 0.1s; }
-.fade-group > *:nth-child(2) { animation-delay: 0.2s; }
-.fade-group > *:nth-child(3) { animation-delay: 0.3s; }
-.fade-group > *:nth-child(4) { animation-delay: 0.4s; }
-.fade-group > *:nth-child(5) { animation-delay: 0.5s; }
-.fade-group > *:nth-child(6) { animation-delay: 0.6s; }
-@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
-
-/* Verdict bar */
-.verdict { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 12px; margin-top: 16px; font-weight: 600; font-size: clamp(13px, 1.3vw, 18px); }
-.verdict-pass { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); color: #4ade80; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Inter',system-ui,sans-serif;background:#0a0e1a;color:#e2e8f0}
+.sc{display:flex;height:100vh;transition:transform .5s cubic-bezier(.4,0,.2,1)}
+.s{min-width:100vw;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(20px,4vw,70px);position:relative;overflow-y:auto}
+.s-title{background:linear-gradient(135deg,#0a0e1a,#1a1040 50%,#0f2040)}
+.s-dark{background:linear-gradient(180deg,#0d1117,#161b22)}
+.s-blue{background:linear-gradient(135deg,#0c1929,#0f2847 60%,#0a1628)}
+.s-green{background:linear-gradient(135deg,#0a1a14,#0f2e1f 60%,#081a10)}
+.s-purple{background:linear-gradient(135deg,#150d24,#1f1040 60%,#120a20)}
+.s-orange{background:linear-gradient(135deg,#1a1008,#2a1a0a 60%,#1a0f06)}
+.s-final{background:linear-gradient(135deg,#0a0e1a,#1a1040 40%,#0a2040 70%,#0a1a14)}
+.cx{max-width:1100px;width:100%;z-index:1}
+h1{font-size:clamp(26px,4vw,58px);font-weight:800;line-height:1.1;margin-bottom:14px}
+h2{font-size:clamp(20px,2.8vw,40px);font-weight:700;line-height:1.2;margin-bottom:16px}
+h3{font-size:clamp(14px,1.6vw,24px);font-weight:600;margin-bottom:8px}
+p,li{font-size:clamp(12px,1.2vw,17px);line-height:1.65;color:#b0bec5}
+.sub{font-size:clamp(13px,1.4vw,20px);color:#64b5f6;font-weight:400;margin-bottom:20px}
+.sep{width:60px;height:4px;background:linear-gradient(90deg,#3b82f6,#22d3ee);border-radius:2px;margin:14px 0}
+.tag{display:inline-block;padding:3px 12px;border-radius:18px;font-size:clamp(9px,.9vw,13px);font-weight:600;margin:2px}
+.tb{background:rgba(59,130,246,.2);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.tg{background:rgba(34,197,94,.2);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.tp{background:rgba(168,85,247,.2);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.to{background:rgba(251,146,60,.2);color:#fb923c;border:1px solid rgba(251,146,60,.3)}
+.ab{color:#60a5fa}.ag{color:#4ade80}.ap{color:#c084fc}.ao{color:#fb923c}.ac{color:#22d3ee}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:14px}
+@media(max-width:768px){.g2,.g3{grid-template-columns:1fr}}
+.cd{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:clamp(14px,1.8vw,24px)}
+.ch{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.06)}
+.cg{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06)}
+.cp{border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.06)}
+.co{border-color:rgba(251,146,60,.4);background:rgba(251,146,60,.06)}
+.bn{font-size:clamp(28px,4vw,60px);font-weight:900;line-height:1}
+.ml{font-size:clamp(10px,.9vw,13px);color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.dt{width:100%;border-collapse:collapse;margin-top:12px;font-size:clamp(10px,1vw,14px)}
+.dt th{background:rgba(59,130,246,.15);color:#60a5fa;padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid rgba(59,130,246,.3)}
+.dt td{padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.06)}
+.ck{color:#4ade80;font-weight:700}
+ul{list-style:none;padding:0}ul li{padding:4px 0 4px 20px;position:relative}
+ul li::before{content:'>';position:absolute;left:0;color:#60a5fa;font-weight:700}
+.sn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-weight:800;font-size:14px;margin-right:10px;flex-shrink:0}
+.sr{display:flex;align-items:flex-start;margin-bottom:10px}
+.vd{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;margin-top:12px;font-weight:600;font-size:clamp(11px,1.1vw,16px);background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#4ade80}
+/* Images */
+.img-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+@media(max-width:768px){.img-grid{grid-template-columns:1fr}}
+.img-box{text-align:center}
+.img-box img{width:100%;max-height:clamp(200px,32vh,380px);object-fit:contain;border-radius:10px;border:1px solid rgba(255,255,255,.1)}
+.img-cap{font-size:clamp(10px,.85vw,12px);color:#64748b;margin-top:4px}
+.img-single img{max-height:clamp(250px,40vh,420px)}
+.insight{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:10px;padding:12px 16px;margin-top:10px;font-size:clamp(11px,1.1vw,15px);color:#94a3b8}
+.insight strong{color:#60a5fa}
+/* Section headers */
+.sec-badge{display:inline-block;padding:4px 14px;border-radius:8px;font-size:clamp(10px,.9vw,13px);font-weight:700;margin-bottom:10px;letter-spacing:1px}
+.sec-math{background:rgba(251,146,60,.15);color:#fb923c;border:1px solid rgba(251,146,60,.3)}
+.sec-py{background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3)}
+.sec-cmp{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+/* Nav */
+.nb{position:fixed;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:rgba(10,14,26,.8);color:#94a3b8;font-size:20px;cursor:pointer;z-index:100;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(8px)}
+.nb:hover{background:rgba(59,130,246,.3);color:#fff;border-color:rgba(59,130,246,.5)}
+.np{left:14px}.nn{right:14px}
+.pb{position:fixed;bottom:0;left:0;height:4px;background:linear-gradient(90deg,#3b82f6,#22d3ee,#a855f7);transition:width .4s;z-index:100}
+.sc-c{position:fixed;bottom:10px;right:18px;font-size:12px;color:#475569;z-index:100;font-weight:500}
+.sh{position:fixed;bottom:36px;left:50%;transform:translateX(-50%);color:#475569;font-size:13px;z-index:100;animation:hp 2s ease-in-out infinite;transition:opacity .5s}
+@keyframes hp{0%,100%{opacity:.4}50%{opacity:.8}}
+.go{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;pointer-events:none}
+/* flow */
+.fl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+.fs{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 14px;text-align:center;font-size:clamp(10px,1vw,14px);font-weight:500}
+.fa{color:#60a5fa;font-size:16px;font-weight:700}
+.pn{font-size:clamp(22px,2.8vw,40px);font-weight:900;color:rgba(59,130,246,.3);line-height:1;min-width:36px}
+.winner{position:relative}.winner::after{content:'HERO';position:absolute;top:-8px;right:-8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-size:9px;font-weight:800;padding:2px 8px;border-radius:10px}
 </style>
 </head>
 <body>
+<div class="sc" id="sc">
 
-<div class="slides-container" id="slidesContainer">
+<!-- S1: TITLE -->
+<div class="s s-title">
+<div class="go" style="width:400px;height:400px;top:-100px;right:-100px;background:#3b82f6"></div>
+<div class="cx" style="text-align:center">
+<div style="margin-bottom:16px"><span class="tag tb">Amp Workflow</span><span class="tag to">Wolfram Mathematica</span><span class="tag tg">Python + Streamlit</span><span class="tag tp">Wiliot Demo</span></div>
+<h1>From Research Paper<br>to <span class="ab">Product Simulation</span></h1>
+<div class="sep" style="margin:16px auto"></div>
+<p class="sub">PassiveBLE x Wiliot: The Complete Journey</p>
+<p style="color:#475569;margin-top:20px">One AI workflow · One paper · Two simulations · Fully executable</p>
+</div></div>
 
-<!-- ========== SLIDE 1: TITLE ========== -->
-<div class="slide slide-title">
-  <div class="glow-orb glow-blue" style="width:400px;height:400px;top:-100px;right:-100px;"></div>
-  <div class="glow-orb glow-purple" style="width:300px;height:300px;bottom:-50px;left:-50px;"></div>
-  <div class="slide-content" style="text-align:center;">
-    <div style="margin-bottom:20px;">
-      <span class="tag tag-blue">Amp Workflow</span>
-      <span class="tag tag-green">Wolfram Mathematica</span>
-      <span class="tag tag-purple">Wiliot Demo</span>
-    </div>
-    <h1>From Research Paper<br>to <span class="accent">Product Simulation</span></h1>
-    <div class="sep" style="margin:20px auto;"></div>
-    <p class="subtitle">PassiveBLE × Wiliot: The Complete Journey</p>
-    <p style="color:#475569; margin-top:24px;">One AI workflow &middot; One paper &middot; One product concept &middot; Fully executable</p>
-  </div>
+<!-- S2: MISSION -->
+<div class="s s-blue">
+<div class="cx">
+<h2>The Mission</h2><div class="sep"></div>
+<p style="font-size:clamp(13px,1.4vw,20px);color:#94a3b8;margin-bottom:20px">Show <strong class="ab">Wiliot</strong> how Amp transforms cutting-edge research into actionable product simulations — in a single automated workflow.</p>
+<div class="g2">
+<div class="cd"><h3 class="ab">Target</h3><p>Demonstrate the paper-to-simulation-to-product pipeline on a topic directly relevant to Wiliot's battery-free IoT business.</p></div>
+<div class="cd"><h3 class="ap">Why Wiliot?</h3><p>Wiliot builds battery-free Bluetooth "IoT Pixels" for supply-chain visibility. PassiveBLE — a BLE backscatter breakthrough — is a perfect fit.</p></div>
+</div>
+<div class="cd" style="margin-top:16px;text-align:center">
+<p style="font-size:clamp(14px,1.6vw,22px);color:#e2e8f0;font-weight:600">"Can a single AI session turn a MobiCom paper into an interactive product prototype?"</p>
+</div></div></div>
+
+<!-- S3: WORKFLOW -->
+<div class="s s-purple">
+<div class="cx">
+<h2>The Amp Workflow: <span class="ap">6 Steps</span></h2><div class="sep" style="background:linear-gradient(90deg,#a855f7,#c084fc)"></div>
+<div class="sr"><span class="sn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">1</span><div><strong>Pick the Paper</strong><br><span style="color:#94a3b8">Curate 5 high-relevance papers from 2024-2026</span></div></div>
+<div class="sr"><span class="sn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">2</span><div><strong>Plain-Language Summary</strong><br><span style="color:#94a3b8">Extract methodology, innovations, key results</span></div></div>
+<div class="sr"><span class="sn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">3</span><div><strong>Commercial Application Ideas</strong><br><span style="color:#94a3b8">3-5 product concepts ranked by feasibility</span></div></div>
+<div class="sr"><span class="sn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">4</span><div><strong>Simulation Plan</strong><br><span style="color:#94a3b8">Model components, data approach, validation</span></div></div>
+<div class="sr"><span class="sn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">5</span><div><strong>Build the Notebook</strong><br><span style="color:#94a3b8">Executable Wolfram Mathematica + Python code</span></div></div>
+<div class="sr"><span class="sn" style="background:linear-gradient(135deg,#a855f7,#7c3aed)">6</span><div><strong>Validation</strong><br><span style="color:#94a3b8">Compare results against paper claims — pass/fail</span></div></div>
+</div></div>
+
+<!-- S4: RESEARCH SLATE -->
+<div class="s s-dark">
+<div class="cx">
+<h2>Step 1: <span class="ab">Research Slate</span></h2><div class="sep"></div>
+<div class="cd winner" style="margin-bottom:10px;border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.06)"><div style="display:flex;gap:12px"><div class="pn" style="color:rgba(251,146,60,.5)">1</div><div><strong class="ao">PassiveBLE — BLE Backscatter with Full Connections</strong><br><span style="color:#94a3b8">arXiv 2503.11490 · MobiCom 2025 · 974 kbps · 9.9 µW</span></div></div></div>
+<div class="cd" style="margin-bottom:6px"><div style="display:flex;gap:12px"><div class="pn">2</div><div><strong>Intermittent Power — Security for Batteryless Devices</strong><br><span style="color:#94a3b8">ACM 2025 · Privacy-aware telemetry</span></div></div></div>
+<div class="cd" style="margin-bottom:6px"><div style="display:flex;gap:12px"><div class="pn">3</div><div><strong>Joint VLC + RF Backscatter Communications</strong><br><span style="color:#94a3b8">arXiv 2603.04626 · Light-assisted smart shelves</span></div></div></div>
+<div class="cd" style="margin-bottom:6px"><div style="display:flex;gap:12px"><div class="pn">4</div><div><strong>Ambient IoT Integration to Cellular (LTE/5G)</strong><br><span style="color:#94a3b8">IEEE · Outdoor parcel transit visibility</span></div></div></div>
+<div class="cd"><div style="display:flex;gap:12px"><div class="pn">5</div><div><strong>5G RF Energy Harvesters</strong><br><span style="color:#94a3b8">MIT 2025 · Metal-safe deployment advisor</span></div></div></div>
+</div></div>
+
+<!-- S5: THE PAPER -->
+<div class="s s-blue">
+<div class="cx">
+<h2>Step 2: <span class="ab">The Paper</span></h2><div class="sep"></div>
+<h3 style="color:#e2e8f0">PassiveBLE: Fully Commodity-Compatible BLE Backscatter</h3>
+<p style="color:#64748b;margin-bottom:16px">Dong et al. · ACM MobiCom 2025 · arXiv 2503.11490</p>
+<div class="g2">
+<div><h3 class="ab" style="font-size:clamp(12px,1.2vw,17px)">What They Did</h3><p>First BLE backscatter system that establishes real BLE connections on data channels — not just advertising packets. Works with unmodified smartphones.</p></div>
+<div><h3 class="ag" style="font-size:clamp(12px,1.2vw,17px)">Key Innovation</h3><p>Distributed coding scheme offloads channel encoding to the excitation source via XOR operations on RF signals — tags stay ultra-low-power.</p></div>
+</div>
+<div class="g3" style="margin-top:16px">
+<div class="cd" style="text-align:center"><div class="bn ab">974</div><div class="ml">kbps goodput (LE 2M)</div></div>
+<div class="cd" style="text-align:center"><div class="bn ag">63.3x</div><div class="ml">faster than prior work</div></div>
+<div class="cd" style="text-align:center"><div class="bn ap">9.9</div><div class="ml">µW ASIC power</div></div>
+</div></div></div>
+
+<!-- S6: THREE BREAKTHROUGHS -->
+<div class="s s-dark">
+<div class="cx">
+<h2>Three Technical Breakthroughs</h2><div class="sep"></div>
+<div class="g3">
+<div class="cd ch"><h3 style="color:#60a5fa">Synchronization</h3><p>Coherent-detection circuit wakes tags with <strong>93 ns</strong> accuracy and <strong>-30 dBm</strong> sensitivity.</p><div style="margin-top:8px"><span class="tag tb">91% @ -30 dBm</span><span class="tag tb">2.5 m range</span></div></div>
+<div class="cd cg"><h3 style="color:#4ade80">Distributed Coding</h3><p>XOR on RF signals: excitation source handles dynamic parameters, tags just scatter. <strong>9.9 µW</strong>.</p><div style="margin-top:8px"><span class="tag tg">XOR on RF</span><span class="tag tg">No decoding</span></div></div>
+<div class="cd cp"><h3 style="color:#c084fc">Connection Scheduler</h3><p>Real BLE connections — establishment, maintenance, frequency hopping — for <strong>multiple tags</strong>.</p><div style="margin-top:8px"><span class="tag tp">>99.9% success</span><span class="tag tp">TDD</span></div></div>
+</div></div></div>
+
+<!-- S7: NUMBERS -->
+<div class="s s-blue">
+<div class="cx">
+<h2>Paper Results: <span class="ab">By the Numbers</span></h2><div class="sep"></div>
+<table class="dt"><tr><th>Metric</th><th>PassiveBLE</th><th>Prior Best</th><th>Gain</th></tr>
+<tr><td>Max Goodput (LE 2M)</td><td><strong>974 kbps</strong></td><td>15.4 kbps</td><td class="ag">63.3x</td></tr>
+<tr><td>Max Goodput (LE 1M)</td><td><strong>532 kbps</strong></td><td>15.4 kbps</td><td class="ag">34.5x</td></tr>
+<tr><td>Connection Type</td><td><strong>Data Channel</strong></td><td>Advertising</td><td class="ag">First ever</td></tr>
+<tr><td>Connection Success</td><td><strong>>99.9%</strong></td><td>N/A</td><td>—</td></tr>
+<tr><td>Power (ASIC)</td><td><strong>9.9 µW</strong></td><td>15.4 µW</td><td class="ag">1.6x</td></tr>
+<tr><td>Max Distance</td><td><strong>17 m</strong></td><td>—</td><td>—</td></tr>
+<tr><td>Sync Accuracy</td><td><strong>93 ns</strong></td><td>—</td><td>—</td></tr>
+</table></div></div>
+
+<!-- S8: COMMERCIAL IDEAS -->
+<div class="s s-green">
+<div class="cx">
+<h2>Step 3: <span class="ag">Commercial Ideas</span></h2><div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80)"></div>
+<div class="g2">
+<div class="cd cg"><h3>Dock-Door Fast Read</h3><p>Scan every item on a pallet as it passes through — no stopping. 974 kbps enables real-time verification.</p><p style="color:#4ade80;font-weight:600;margin-top:6px">Top Pick</p></div>
+<div class="cd"><h3>Authenticated IoT</h3><p>BLE data connections provide encryption that advertising cannot — critical for pharma and high-value goods.</p></div>
+<div class="cd"><h3>In-Vehicle Sensors</h3><p>Battery-free sensor networks inside vehicles at 532+ kbps — automotive and fleet management.</p></div>
+<div class="cd"><h3>Smart Shelf Inventory</h3><p>Continuous shelf-level visibility using passive BLE tags that connect to any smartphone.</p></div>
+</div></div></div>
+
+<!-- S9: HERO DEMO -->
+<div class="s s-orange">
+<div class="cx">
+<h2>Step 4: <span class="ao">Hero Demo</span></h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="g2">
+<div><ul class="orange"><li>Direct Wiliot relevance — supply-chain core</li><li>Quantifiable: read rate, throughput, tags/second</li><li>Interactive parameters: speed, tags, door width</li><li>Multi-physics: RF + scheduling + energy</li></ul></div>
+<div class="cd co" style="text-align:center;display:flex;flex-direction:column;justify-content:center">
+<div style="font-size:40px;margin-bottom:8px">&#x1F6AA;</div>
+<h3 class="ao">The Scenario</h3>
+<p style="margin-top:6px"><strong>32 tagged items</strong> through a <strong>2 m dock door</strong> at <strong>1 m/s</strong></p>
+<p style="color:#fb923c;font-weight:700;margin-top:10px;font-size:clamp(14px,1.6vw,24px)">Can we read every tag?</p>
+</div></div></div></div>
+
+<!-- ========== MATHEMATICA SECTION ========== -->
+
+<!-- S10: MATH — Overview -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-math">MATHEMATICA SIMULATION</span>
+<h2>Notebook Overview & Parameters</h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="Mathematica-Simulation/1.png" alt="Notebook parameters"><div class="img-cap">System parameters table loaded from PassiveBLE.wl</div></div>
+<div class="img-box"><img src="Mathematica-Simulation/Asic Power breackdown.png" alt="ASIC power breakdown"><div class="img-cap">ASIC power breakdown: Static 0.9, Dynamic 9.9, Sync Amp 162.4, Sync Comp 27.9 µW</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> The notebook loads all paper parameters into a structured table via PassiveBLE.wl. The ASIC breakdown reveals that synchronization circuitry (190.3 µW) dominates power — the actual baseband processing is just 10.8 µW total.</div>
+</div></div>
+
+<!-- S11: MATH — RF Link Budget -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-math">MATHEMATICA SIMULATION</span>
+<h2>RF Link Budget</h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="Mathematica-Simulation/Rf Link Budget .png" alt="Path loss"><div class="img-cap">Free-space path loss at 2.44 GHz — logarithmic increase, 17m paper max marked</div></div>
+<div class="img-box"><img src="Mathematica-Simulation/recived power map.png" alt="Received power"><div class="img-cap">Received power at 5 TX levels (0-20 dBm), -30 dBm wake-up threshold</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> Friis equation models RF propagation. At 20 dBm EIRP, the signal stays above the -30 dBm wake-up threshold to ~3m. Lower TX powers fall below threshold almost immediately — excitation source proximity is critical for passive operation.</div>
+</div></div>
+
+<!-- S12: MATH — Wake-Up -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-math">MATHEMATICA SIMULATION</span>
+<h2>Wake-Up Performance</h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="Mathematica-Simulation/Wake Up Probabailty.png" alt="Wake-up probability"><div class="img-cap">Logistic model (blue) vs paper data (red dots), -30 dBm / 91% threshold</div></div>
+<div class="img-box"><img src="Mathematica-Simulation/wakup distence .png" alt="Wake-up distance"><div class="img-cap">Success rate vs distance — >95% within 1.5m, >80% within 2.5m</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> The logistic model closely fits the paper's measured wake-up curve. Steep transition around -30 dBm — below -32 dBm, wake-up drops to near zero. This defines practical excitation source placement: keep within 2m for reliable operation.</div>
+</div></div>
+
+<!-- S13: MATH — Throughput -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-math">MATHEMATICA SIMULATION</span>
+<h2>Throughput Analysis</h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="Mathematica-Simulation/comunication preformence .png" alt="Goodput LoS"><div class="img-cap">LoS goodput: LE 2M peaks at 974 kbps (blue), LE 1M at 532 kbps (red)</div></div>
+<div class="img-box"><img src="Mathematica-Simulation/goodput  vs distence.png" alt="LoS vs NLoS"><div class="img-cap">LoS vs NLoS comparison — NLoS reduces throughput by 15-30%</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> Goodput decays exponentially with distance. LE 2M maintains ~500 kbps at 5m but drops to ~150 kbps at 15m. NLoS (dashed) shows significant degradation from walls/obstacles. For dock-door use, tags stay within 2m so throughput remains near peak.</div>
+</div></div>
+
+<!-- S14: MATH — BER & Connection -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-math">MATHEMATICA SIMULATION</span>
+<h2>BER & Connection Performance</h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="Mathematica-Simulation/bit error rate vs distence .png" alt="BER"><div class="img-cap">BER vs distance (log scale) — LE 2M higher BER but still superior throughput</div></div>
+<div class="img-box"><img src="Mathematica-Simulation/BLE Connection preformence .png" alt="Connection"><div class="img-cap">Establishment (green) vs maintenance (orange) — 99.9% reference line</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> BER grows from 10<sup>-6</sup> at close range to 10<sup>-4</sup> at 18m. LE 2M has higher BER due to faster symbol rate but still delivers superior net throughput. Connection maintenance degrades faster than establishment — sustained transmission exposes tags to more channel variability.</div>
+</div></div>
+
+<!-- S15: MATH — Multi-Tag & Dashboard -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-math">MATHEMATICA SIMULATION</span>
+<h2>Multi-Tag Scheduling & Interactive Dashboard</h2><div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="Mathematica-Simulation/Multi tag simulation .png" alt="Multi-tag"><div class="img-cap">Per-tag goodput vs tag count (log scale) at 2m, 5m, 10m</div></div>
+<div class="img-box"><img src="Mathematica-Simulation/interactive dashboard.png" alt="Dashboard"><div class="img-cap">Manipulate dashboard: 32 tags, 0.8 m/s, 99.6% read rate, Self-Powered</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> Per-tag throughput scales as ~1/N due to TDD time-sharing. At 32 tags and 2m: ~20 kbps per tag — still sufficient for 32-byte payloads. The Manipulate dashboard provides instant slider-driven feedback — change any parameter and see results immediately without re-running code.</div>
+</div></div>
+
+<!-- ========== PYTHON SECTION ========== -->
+
+<!-- S16: PY — Dashboard Overview -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-py">PYTHON + STREAMLIT</span>
+<h2>Streamlit Dashboard Overview</h2><div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="py_simulation/Dock-Door Fast-Read Simulator 1.png" alt="Dashboard main"><div class="img-cap">Main dashboard: 4 KPI cards, sidebar controls, dock-door analysis with speed/tag charts</div></div>
+<div class="img-box"><img src="py_simulation/Read-Rate.png" alt="3D space"><div class="img-cap">3D design space (Plotly) — fully rotatable/zoomable + multi-tag throughput scaling</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> The Streamlit dashboard provides the same simulation in any web browser — no Mathematica license needed. Sidebar sliders control all parameters across 5 tabs. The 3D Plotly surface is fully rotatable and zoomable — a capability impossible in Mathematica's static notebook output.</div>
+</div></div>
+
+<!-- S17: PY — RF & Throughput -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-py">PYTHON + STREAMLIT</span>
+<h2>RF, Throughput & BER</h2><div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80)"></div>
+<div class="img-grid">
+<div class="img-box"><img src="py_simulation/RF-Walkup.png" alt="RF wake-up"><div class="img-cap">RF & Wake-Up tab: received power, wake-up probability, energy harvesting</div></div>
+<div class="img-box"><img src="py_simulation/ThroughPut and BER.png" alt="Throughput BER"><div class="img-cap">Throughput tab: LoS/NLoS goodput, BER, connection establishment/maintenance</div></div>
+</div>
+<div class="insight"><strong>Insight:</strong> All RF and communication models from Mathematica reproduced identically in Python. Plotly charts support <strong>hover tooltips</strong> showing exact values at any data point — a significant UX advantage over Mathematica's static output. Energy harvesting feasibility updates live when you change TX EIRP or antenna gain.</div>
+</div></div>
+
+<!-- S18: PY — Validation -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-py">PYTHON + STREAMLIT</span>
+<h2>Validation & Comparison</h2><div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80)"></div>
+<div class="img-box img-single" style="text-align:center"><img src="py_simulation/Validation .png" alt="Validation" style="max-width:800px"><div class="img-cap">6/6 paper validation PASS, 8/8 physics checks PASS, prior systems throughput comparison</div></div>
+<div class="insight" style="margin-top:14px"><strong>Insight:</strong> Same validation framework as Mathematica: all 6 paper metrics match within tolerance, all 8 physics consistency checks pass. The prior systems bar chart dramatically shows PassiveBLE's 63.3x throughput improvement — from 15.4 kbps (2021) to 974 kbps.</div>
+</div></div>
+
+<!-- ========== COMPARISON SECTION ========== -->
+
+<!-- S19: TECHNICAL COMPARISON -->
+<div class="s s-purple">
+<div class="cx">
+<span class="sec-badge sec-cmp">TECHNICAL COMPARISON</span>
+<h2>Mathematica vs Python: <span class="ap">Head to Head</span></h2><div class="sep" style="background:linear-gradient(90deg,#a855f7,#c084fc)"></div>
+<table class="dt">
+<tr><th>Aspect</th><th style="color:#fb923c">Mathematica</th><th style="color:#4ade80">Python + Streamlit</th></tr>
+<tr><td>Interactivity</td><td>Manipulate: instant kernel-side sliders</td><td>Browser-based; Plotly hover/zoom/rotate</td></tr>
+<tr><td>3D Visualization</td><td>Static ViewPoint rotation in notebook</td><td>Plotly: fully rotatable/zoomable in browser</td></tr>
+<tr><td>Symbolic Math</td><td>Native CAS — derive formulas symbolically</td><td>Numerical only (SymPy for symbolic)</td></tr>
+<tr><td>Plot Quality</td><td>Publication-ready vector; fine Epilog control</td><td>Dark-themed interactive; raster from matplotlib</td></tr>
+<tr><td>Hover/Tooltips</td><td>None — static output</td><td>Exact values on hover at any point</td></tr>
+<tr><td>Code Reuse</td><td>.wl BeginPackage/EndPackage</td><td>Standard module; dataclasses; type hints</td></tr>
+<tr><td>Extensibility</td><td>Paclets, Wolfram Cloud</td><td>pip: pandas, scikit-learn, TF, API</td></tr>
+<tr><td>Reproducibility</td><td>SeedRandom[42]; cell order can be ambiguous</td><td>Deterministic script; CI/CD; git-friendly</td></tr>
+<tr><td>Sharing</td><td>PDF/CDF or Wolfram Cloud</td><td>URL, Streamlit Cloud, Docker</td></tr>
+<tr><td>Validation</td><td>proof_audit.wls (WolframScript)</td><td>Inline assertions + pytest compatible</td></tr>
+</table>
+</div></div>
+
+<!-- S20: WHEN TO USE -->
+<div class="s s-dark">
+<div class="cx">
+<span class="sec-badge sec-cmp">TECHNICAL COMPARISON</span>
+<h2>When to Use Which</h2><div class="sep" style="background:linear-gradient(90deg,#a855f7,#c084fc)"></div>
+<div class="g2">
+<div class="cd co">
+<h3 class="ao">Mathematica</h3>
+<ul><li><strong>R&D exploration</strong> — modify equations on the fly</li>
+<li><strong>Symbolic derivation</strong> — CAS for closed-form solutions</li>
+<li><strong>Live demos</strong> — Manipulate for instant parameter sweeps</li>
+<li><strong>Publication figures</strong> — vector, camera-ready</li>
+<li><strong>Rapid prototyping</strong> — fewer lines for complex math</li></ul>
+</div>
+<div class="cd cg">
+<h3 class="ag">Python + Streamlit</h3>
+<ul><li><strong>Sharing with engineers</strong> — browser, no license</li>
+<li><strong>CI/CD integration</strong> — pytest, GitHub Actions</li>
+<li><strong>Web dashboards</strong> — Plotly interactivity, tooltips</li>
+<li><strong>ML/data pipelines</strong> — pandas, scikit-learn, TF</li>
+<li><strong>3D exploration</strong> — rotatable, zoomable surfaces</li></ul>
+</div>
+</div>
+<div class="vd" style="margin-top:20px;background:rgba(168,85,247,.12);border-color:rgba(168,85,247,.3);color:#c084fc;text-align:center;justify-content:center">
+Use Mathematica to explore and discover. Use Python to ship and scale.
+</div>
+</div></div>
+
+<!-- S21: CLOSING -->
+<div class="s s-final">
+<div class="go" style="width:500px;height:500px;top:-150px;right:-150px;background:#3b82f6"></div>
+<div class="go" style="width:400px;height:400px;bottom:-100px;left:-100px;background:#a855f7"></div>
+<div class="cx" style="text-align:center">
+<h1 style="margin-bottom:20px">One Paper.<br><span class="ab">Two Simulations.</span><br><span class="ag">One Product Concept.</span></h1>
+<div class="sep" style="margin:20px auto;width:100px"></div>
+<p style="font-size:clamp(14px,1.5vw,20px);color:#94a3b8;max-width:700px;margin:0 auto 28px">Amp turned a MobiCom 2025 paper into validated, interactive product simulations in both Mathematica and Python — with reusable code, automated verification, and a clear path to Wiliot's next product.</p>
+<div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+<span class="tag to" style="font-size:13px;padding:6px 16px">PassiveBLE.wl</span>
+<span class="tag tg" style="font-size:13px;padding:6px 16px">passiveble.py</span>
+<span class="tag tb" style="font-size:13px;padding:6px 16px">13-Section Notebook</span>
+<span class="tag tp" style="font-size:13px;padding:6px 16px">Streamlit Dashboard</span>
+<span class="tag to" style="font-size:13px;padding:6px 16px">6/6 Validated</span>
+</div>
+<p style="color:#475569;margin-top:36px;font-size:13px">PassiveBLE x Wiliot Demo · Built with Amp · April 2026</p>
+</div></div>
+
 </div>
 
-<!-- ========== SLIDE 2: THE MISSION ========== -->
-<div class="slide slide-blue">
-  <div class="glow-orb glow-blue" style="width:300px;height:300px;top:10%;left:-80px;"></div>
-  <div class="slide-content fade-group">
-    <h2>The Mission</h2>
-    <div class="sep"></div>
-    <p style="font-size:clamp(14px,1.6vw,22px); color:#94a3b8; margin-bottom:24px;">Show <strong class="accent">Wiliot</strong> how Amp transforms cutting-edge research into actionable product simulations — in a single automated workflow.</p>
-    <div class="grid-2">
-      <div class="card">
-        <h3 class="accent">🎯 Goal</h3>
-        <p>Demonstrate the <em>paper → simulation → product</em> pipeline on a topic directly relevant to Wiliot's battery-free IoT business.</p>
-      </div>
-      <div class="card">
-        <h3 class="accent-purple">💡 Why Wiliot?</h3>
-        <p>Wiliot builds battery-free Bluetooth "IoT Pixels" for supply-chain visibility. PassiveBLE — a BLE backscatter breakthrough — is a perfect fit.</p>
-      </div>
-    </div>
-    <div class="card" style="margin-top:20px; text-align:center;">
-      <p style="font-size:clamp(13px,1.3vw,18px); color:#64748b;">The question we answer:</p>
-      <p style="font-size:clamp(16px,1.8vw,26px); color:#e2e8f0; font-weight:600; margin-top:8px;">"Can a single AI session turn a MobiCom paper into an interactive product prototype?"</p>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 3: THE AMP WORKFLOW ========== -->
-<div class="slide slide-purple">
-  <div class="glow-orb glow-purple" style="width:350px;height:350px;bottom:-80px;right:-80px;"></div>
-  <div class="slide-content fade-group">
-    <h2>The Amp Workflow: <span class="accent-purple">6 Steps</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#a855f7,#c084fc);"></div>
-    <div class="step-row"><span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">1</span><div class="step-text"><strong>Pick the Paper</strong><br><span style="color:#94a3b8;">Curate a research slate of 5 high-relevance papers from 2024-2026</span></div></div>
-    <div class="step-row"><span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">2</span><div class="step-text"><strong>Plain-Language Summary</strong><br><span style="color:#94a3b8;">Extract methodology, innovations, and key results in non-technical language</span></div></div>
-    <div class="step-row"><span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">3</span><div class="step-text"><strong>Commercial Application Ideas</strong><br><span style="color:#94a3b8;">Generate 3-5 actionable product concepts ranked by feasibility</span></div></div>
-    <div class="step-row"><span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">4</span><div class="step-text"><strong>Simulation Plan</strong><br><span style="color:#94a3b8;">Define model components, data approach, and validation strategy</span></div></div>
-    <div class="step-row"><span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">5</span><div class="step-text"><strong>Build the Notebook</strong><br><span style="color:#94a3b8;">Generate executable Wolfram Mathematica code with interactive visualizations</span></div></div>
-    <div class="step-row"><span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">6</span><div class="step-text"><strong>Validation</strong><br><span style="color:#94a3b8;">Compare simulation results against paper claims — pass/fail with tolerances</span></div></div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 4: RESEARCH SLATE ========== -->
-<div class="slide slide-dark">
-  <div class="slide-content fade-group">
-    <h2>Step 1: <span class="accent">Research Slate</span></h2>
-    <div class="sep"></div>
-    <p style="margin-bottom:16px; color:#94a3b8;">We curated 5 papers from arXiv and IEEE (2024-2026), each scored for Wiliot relevance:</p>
-    <div class="card winner" style="margin-bottom:12px; border-color:rgba(251,146,60,0.5); background:rgba(251,146,60,0.06);">
-      <div class="paper-card"><div class="paper-num" style="color:rgba(251,146,60,0.5);">1</div><div><strong class="accent-orange">PassiveBLE — BLE Backscatter with Full Connections</strong><br><span style="color:#94a3b8;">arXiv 2503.11490 · MobiCom 2025 · 974 kbps · 9.9 µW ASIC</span><br><span class="tag tag-orange" style="margin-top:6px;">Dock-Door Fast Read</span></div></div>
-    </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div class="paper-card"><div class="paper-num">2</div><div><strong>Intermittent Power — Security for Batteryless Devices</strong><br><span style="color:#94a3b8;">ACM 2025 · Privacy-aware telemetry · Compliance auditor</span></div></div>
-    </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div class="paper-card"><div class="paper-num">3</div><div><strong>Joint VLC + RF Backscatter Communications</strong><br><span style="color:#94a3b8;">arXiv 2603.04626 · Light-assisted smart shelves</span></div></div>
-    </div>
-    <div class="card" style="margin-bottom:8px;">
-      <div class="paper-card"><div class="paper-num">4</div><div><strong>Ambient IoT Integration to Cellular (LTE/5G)</strong><br><span style="color:#94a3b8;">IEEE · Outdoor parcel transit visibility</span></div></div>
-    </div>
-    <div class="card">
-      <div class="paper-card"><div class="paper-num">5</div><div><strong>5G RF Energy Harvesters</strong><br><span style="color:#94a3b8;">MIT 2025 · Metal-safe/object-safe deployment advisor</span></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 5: THE PAPER ========== -->
-<div class="slide slide-blue">
-  <div class="glow-orb glow-blue" style="width:400px;height:400px;top:-100px;right:-100px;"></div>
-  <div class="slide-content fade-group">
-    <h2>Step 2: <span class="accent">The Paper</span></h2>
-    <div class="sep"></div>
-    <h3 style="color:#e2e8f0;">PassiveBLE: Towards Fully Commodity-Compatible BLE Backscatter</h3>
-    <p style="color:#64748b; margin-bottom:20px;">Dong et al. · ACM MobiCom 2025 · arXiv 2503.11490</p>
-    <div class="grid-2">
-      <div>
-        <h3 class="accent" style="font-size:clamp(14px,1.4vw,20px);">What They Did</h3>
-        <p>Built the first BLE backscatter system that establishes <strong>real BLE connections</strong> (on data channels) — not just one-shot advertising packets. Compatible with unmodified smartphones.</p>
-      </div>
-      <div>
-        <h3 class="accent-green" style="font-size:clamp(14px,1.4vw,20px);">Key Innovation</h3>
-        <p>A <strong>distributed coding scheme</strong> that offloads channel encoding to the excitation source via XOR operations on RF signals — so tags stay ultra-low-power while generating full BLE packets.</p>
-      </div>
-    </div>
-    <div class="grid-3" style="margin-top:20px;">
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent">974</div>
-        <div class="metric-label">kbps goodput (LE 2M)</div>
-      </div>
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent-green">63.3×</div>
-        <div class="metric-label">faster than prior work</div>
-      </div>
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent-purple">9.9</div>
-        <div class="metric-label">µW ASIC power</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 6: THREE BREAKTHROUGHS ========== -->
-<div class="slide slide-dark">
-  <div class="slide-content fade-group">
-    <h2>Three Technical Breakthroughs</h2>
-    <div class="sep"></div>
-    <div class="grid-3">
-      <div class="card card-highlight">
-        <h3 style="color:#60a5fa;">⚡ Synchronization</h3>
-        <p>Coherent-detection circuit wakes tags with <strong>93 ns</strong> accuracy and <strong>-30 dBm</strong> sensitivity. Enables symbol-level timing for BLE data packets.</p>
-        <div style="margin-top:12px;">
-          <span class="tag tag-blue">91% @ -30 dBm</span>
-          <span class="tag tag-blue">2.5 m range</span>
-        </div>
-      </div>
-      <div class="card card-green">
-        <h3 style="color:#4ade80;">🔀 Distributed Coding</h3>
-        <p>XOR on RF signals: excitation source handles dynamic parameters, tags just scatter. Full BLE encoding at <strong>9.9 µW</strong>.</p>
-        <div style="margin-top:12px;">
-          <span class="tag tag-green">No decoding on tag</span>
-          <span class="tag tag-green">XOR on RF</span>
-        </div>
-      </div>
-      <div class="card card-purple">
-        <h3 style="color:#c084fc;">📡 Connection Scheduler</h3>
-        <p>Manages real BLE connections — establishment, maintenance, termination, frequency hopping — for <strong>multiple tags</strong> simultaneously.</p>
-        <div style="margin-top:12px;">
-          <span class="tag tag-purple">>99.9% success</span>
-          <span class="tag tag-purple">TDD multi-tag</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 7: PAPER NUMBERS ========== -->
-<div class="slide slide-blue">
-  <div class="glow-orb glow-green" style="width:300px;height:300px;bottom:-60px;left:-60px;"></div>
-  <div class="slide-content fade-group">
-    <h2>Paper Results: <span class="accent">By the Numbers</span></h2>
-    <div class="sep"></div>
-    <table class="data-table">
-      <tr><th>Metric</th><th>PassiveBLE</th><th>Prior Best</th><th>Improvement</th></tr>
-      <tr><td>Max Goodput (LE 2M)</td><td><strong>974 kbps</strong></td><td>15.4 kbps</td><td class="accent-green">63.3×</td></tr>
-      <tr><td>Max Goodput (LE 1M)</td><td><strong>532 kbps</strong></td><td>15.4 kbps</td><td class="accent-green">34.5×</td></tr>
-      <tr><td>Connection Type</td><td><strong>Data Channel</strong></td><td>Advertising only</td><td class="accent-green">First ever</td></tr>
-      <tr><td>Connection Success</td><td><strong>>99.9%</strong></td><td>N/A</td><td class="accent-green">—</td></tr>
-      <tr><td>Power (ASIC)</td><td><strong>9.9 µW</strong></td><td>15.4 µW</td><td class="accent-green">1.6×</td></tr>
-      <tr><td>Power (COTS prototype)</td><td><strong>491 µW</strong></td><td>—</td><td>—</td></tr>
-      <tr><td>Max Distance</td><td><strong>17 m</strong></td><td>—</td><td>—</td></tr>
-      <tr><td>Sync Accuracy</td><td><strong>93 ns</strong></td><td>—</td><td>—</td></tr>
-    </table>
-  </div>
-</div>
-
-<!-- ========== SLIDE 8: COMMERCIAL IDEAS ========== -->
-<div class="slide slide-green">
-  <div class="glow-orb glow-green" style="width:350px;height:350px;top:-80px;right:-80px;"></div>
-  <div class="slide-content fade-group">
-    <h2>Step 3: <span class="accent-green">Commercial Ideas for Wiliot</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80);"></div>
-    <div class="grid-2">
-      <div class="card card-green">
-        <h3>🚪 Fast-Read Dock Door</h3>
-        <p>Scan every item on a pallet as it passes through — no stopping. 974 kbps throughput enables real-time item-level verification.</p>
-        <p style="color:#4ade80; font-weight:600; margin-top:8px;">⭐⭐⭐⭐⭐ Top Pick</p>
-      </div>
-      <div class="card">
-        <h3>🔐 Authenticated IoT</h3>
-        <p>BLE data connections provide encryption and security that advertising packets cannot — critical for pharmaceutical and high-value goods.</p>
-        <p style="color:#60a5fa; margin-top:8px;">⭐⭐⭐⭐☆</p>
-      </div>
-      <div class="card">
-        <h3>🏭 In-Vehicle Sensors</h3>
-        <p>Battery-free sensor networks inside vehicles at 532+ kbps — serving automotive and fleet management.</p>
-        <p style="color:#60a5fa; margin-top:8px;">⭐⭐⭐⭐☆</p>
-      </div>
-      <div class="card">
-        <h3>📦 Smart Shelf Inventory</h3>
-        <p>Continuous shelf-level visibility using passive BLE tags that connect to any smartphone or tablet without modification.</p>
-        <p style="color:#60a5fa; margin-top:8px;">⭐⭐⭐☆☆</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 9: HERO DEMO SELECTION ========== -->
-<div class="slide slide-orange">
-  <div class="glow-orb" style="width:300px;height:300px;background:#f59e0b;top:-60px;left:-60px;"></div>
-  <div class="slide-content fade-group">
-    <h2>Step 4: <span class="accent-orange">Hero Demo Selection</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c);"></div>
-    <p style="margin-bottom:20px; font-size:clamp(14px,1.5vw,20px);">Why <strong>Dock-Door Fast Read</strong> wins as the hero simulation:</p>
-    <div class="grid-2">
-      <div>
-        <ul class="orange">
-          <li><strong>Direct Wiliot relevance</strong> — supply-chain is their core market</li>
-          <li><strong>Quantifiable results</strong> — read rate, throughput, tags/second</li>
-          <li><strong>Interactive parameters</strong> — speed, tag count, door width</li>
-          <li><strong>Multi-physics</strong> — RF propagation + scheduling + energy harvesting</li>
-        </ul>
-      </div>
-      <div class="card card-orange" style="text-align:center; display:flex; flex-direction:column; justify-content:center;">
-        <div style="font-size:48px; margin-bottom:12px;">🚪</div>
-        <h3 class="accent-orange">The Scenario</h3>
-        <p style="margin-top:8px;">Forklift carries pallet with <strong>32 tagged items</strong> through a <strong>2 m dock door</strong> at <strong>1 m/s</strong></p>
-        <p style="color:#fb923c; font-weight:700; margin-top:12px; font-size:clamp(16px,2vw,28px);">Can we read every tag?</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 10: SIMULATION PLAN ========== -->
-<div class="slide slide-dark">
-  <div class="slide-content fade-group">
-    <h2>Step 5: <span class="accent">Simulation Architecture</span></h2>
-    <div class="sep"></div>
-    <p style="margin-bottom:16px; color:#94a3b8;">Six simulation modules chained together into a complete product model:</p>
-    <div class="flow">
-      <div class="flow-step" style="border-color:rgba(59,130,246,0.4);">📡 RF Link Budget<br><span style="font-size:11px;color:#64748b;">Friis propagation</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(34,197,94,0.4);">⚡ Wake-Up Model<br><span style="font-size:11px;color:#64748b;">Logistic fit</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(168,85,247,0.4);">📊 Throughput<br><span style="font-size:11px;color:#64748b;">Goodput + BER</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(251,146,60,0.4);">🔗 Connection<br><span style="font-size:11px;color:#64748b;">BLE scheduler</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(239,68,68,0.4);">🔋 Power Budget<br><span style="font-size:11px;color:#64748b;">Energy harvest</span></div>
-      <div class="flow-arrow">→</div>
-      <div class="flow-step" style="border-color:rgba(251,191,36,0.5); background:rgba(251,191,36,0.08);">🚪 Dock Door<br><span style="font-size:11px;color:#fbbf24;">Product sim</span></div>
-    </div>
-    <div class="grid-2" style="margin-top:20px;">
-      <div class="card">
-        <h3 class="accent">PassiveBLE.wl</h3>
-        <p>Reusable Wolfram package with <strong>16 public functions</strong> covering RF propagation, BLE performance, multi-tag scheduling, energy harvesting, and dock-door simulation.</p>
-      </div>
-      <div class="card">
-        <h3 class="accent-purple">PassiveBLE_WiliotDemo.nb</h3>
-        <p>Interactive notebook with <strong>13 sections</strong>, <strong>9 subsections</strong>, <strong>6 visualization types</strong>, and a 4-control Manipulate dashboard.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 11: THE PACKAGE ========== -->
-<div class="slide slide-blue">
-  <div class="slide-content fade-group">
-    <h2>The Package: <span class="accent">PassiveBLE.wl</span></h2>
-    <div class="sep"></div>
-    <div class="grid-3">
-      <div class="card">
-        <h3 style="color:#60a5fa; font-size:14px;">RF Layer</h3>
-        <ul style="font-size:13px;">
-          <li>FriisPathLoss</li>
-          <li>ReceivedPower</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 style="color:#4ade80; font-size:14px;">Wake-Up</h3>
-        <ul class="green" style="font-size:13px;">
-          <li>WakeUpProbability</li>
-          <li>Logistic fit to paper</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 style="color:#c084fc; font-size:14px;">Communication</h3>
-        <ul class="purple" style="font-size:13px;">
-          <li>GoodputLoS / NLoS</li>
-          <li>BERModel</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 style="color:#fb923c; font-size:14px;">Connection</h3>
-        <ul class="orange" style="font-size:13px;">
-          <li>ConnectionSuccessRate</li>
-          <li>ConnectionMaintenanceRate</li>
-          <li>MultiTagGoodput</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 style="color:#22d3ee; font-size:14px;">Power</h3>
-        <ul style="font-size:13px;">
-          <li>PowerBudget</li>
-          <li>PowerBreakdown</li>
-          <li>EnergyHarvestFeasibility</li>
-        </ul>
-      </div>
-      <div class="card" style="border-color:rgba(251,191,36,0.4); background:rgba(251,191,36,0.06);">
-        <h3 style="color:#fbbf24; font-size:14px;">Product</h3>
-        <ul style="font-size:13px;">
-          <li>DockDoorSimulation</li>
-          <li>TagReadTime</li>
-          <li>SystemParameters</li>
-        </ul>
-      </div>
-    </div>
-    <div class="verdict verdict-pass" style="margin-top:20px;">
-      <span style="font-size:24px;">📦</span>
-      16 public functions · All paper parameters encoded · Fully reusable for future simulations
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 12: NOTEBOOK STRUCTURE ========== -->
-<div class="slide slide-dark">
-  <div class="slide-content fade-group">
-    <h2>The Notebook: <span class="accent-purple">13 Sections</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#a855f7,#c084fc);"></div>
-    <div class="grid-2">
-      <div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">1</span><span style="font-size:14px;">Introduction & Paper Overview</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">2</span><span style="font-size:14px;">System Parameters & Constants</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">3</span><span style="font-size:14px;">RF Link Budget Model</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">4</span><span style="font-size:14px;">Wake-Up & Synchronization</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">5</span><span style="font-size:14px;">Communication Performance</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">6</span><span style="font-size:14px;">BLE Connection Performance</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">7</span><span style="font-size:14px;">Multi-Tag Scheduling</span></div>
-      </div>
-      <div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">8</span><span style="font-size:14px;">Power Budget & Energy Harvesting</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">9</span><span style="font-size:14px;">Wiliot Dock-Door Product Concept</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;background:linear-gradient(135deg,#f59e0b,#d97706);">10</span><span style="font-size:14px;"><strong class="accent-orange">Interactive Dashboard</strong> (Manipulate)</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">11</span><span style="font-size:14px;">3D Design Space Exploration</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">12</span><span style="font-size:14px;">Validation Against Paper</span></div>
-        <div class="step-row"><span class="step-num" style="width:28px;height:28px;font-size:12px;">13</span><span style="font-size:14px;">Key Findings & Implications</span></div>
-      </div>
-    </div>
-    <div class="grid-3" style="margin-top:16px;">
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent" style="font-size:clamp(24px,3vw,48px);">9</div>
-        <div class="metric-label">Subsections</div>
-      </div>
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent-green" style="font-size:clamp(24px,3vw,48px);">6</div>
-        <div class="metric-label">Visualization Types</div>
-      </div>
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent-orange" style="font-size:clamp(24px,3vw,48px);">4</div>
-        <div class="metric-label">Interactive Controls</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 13: KEY RESULTS ========== -->
-<div class="slide slide-green">
-  <div class="glow-orb glow-green" style="width:350px;height:350px;bottom:-80px;right:-100px;"></div>
-  <div class="slide-content fade-group">
-    <h2>Simulation Results: <span class="accent-green">Dock Door</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80);"></div>
-    <p style="margin-bottom:20px; color:#94a3b8;">32 tags on a pallet passing through a 2 m dock door at 1 m/s:</p>
-    <div class="grid-3">
-      <div class="card card-green" style="text-align:center;">
-        <div class="big-num accent-green">95%+</div>
-        <div class="metric-label">Tag Read Rate</div>
-        <p style="margin-top:8px; font-size:12px;">At 1 m/s with LE 2M PHY</p>
-      </div>
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent-cyan">2000</div>
-        <div class="metric-label">ms Dwell Time</div>
-        <p style="margin-top:8px; font-size:12px;">Time in aperture</p>
-      </div>
-      <div class="card" style="text-align:center;">
-        <div class="big-num accent-purple">9.9</div>
-        <div class="metric-label">µW Self-Powered</div>
-        <p style="margin-top:8px; font-size:12px;">RF energy harvesting</p>
-      </div>
-    </div>
-    <div class="grid-2" style="margin-top:16px;">
-      <div class="card">
-        <h3 class="accent-green" style="font-size:15px;">✅ What Works</h3>
-        <ul class="green" style="font-size:13px;">
-          <li>32 tags at ≤1 m/s → >95% read rate</li>
-          <li>ASIC tags self-powered within 1.5 m of reader</li>
-          <li>BLE data connections = authenticated reads</li>
-          <li>Works with unmodified smartphones</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 class="accent-orange" style="font-size:15px;">⚠️ Limitations Found</h3>
-        <ul class="orange" style="font-size:13px;">
-          <li>64+ tags at >2 m/s → read rate drops below 80%</li>
-          <li>COTS prototype (491 µW) needs external power beyond 0.5 m</li>
-          <li>NLoS reduces goodput by ~15-30%</li>
-          <li>Max distance 17 m limits outdoor use</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 14: VALIDATION ========== -->
-<div class="slide slide-blue">
-  <div class="slide-content fade-group">
-    <h2>Step 6: <span class="accent">Validation</span></h2>
-    <div class="sep"></div>
-    <p style="margin-bottom:16px; color:#94a3b8;">Every model output compared against the paper's reported values:</p>
-    <table class="data-table">
-      <tr><th>Metric</th><th>Paper</th><th>Model</th><th>Error</th><th>Status</th></tr>
-      <tr><td>Max Goodput LE 2M</td><td>974 kbps</td><td>974 kbps</td><td>0%</td><td class="check">✓ PASS</td></tr>
-      <tr><td>Max Goodput LE 1M</td><td>532 kbps</td><td>532 kbps</td><td>0%</td><td class="check">✓ PASS</td></tr>
-      <tr><td>Connection Success</td><td>>99.9%</td><td>99.9%</td><td>&lt;1%</td><td class="check">✓ PASS</td></tr>
-      <tr><td>Wake-Up @ -30 dBm</td><td>91%</td><td>~91%</td><td>&lt;10%</td><td class="check">✓ PASS</td></tr>
-      <tr><td>ASIC Power</td><td>9.9 µW</td><td>9.9 µW</td><td>0%</td><td class="check">✓ PASS</td></tr>
-      <tr><td>COTS Power</td><td>491 µW</td><td>491 µW</td><td>0%</td><td class="check">✓ PASS</td></tr>
-    </table>
-    <div class="verdict verdict-pass">
-      <span style="font-size:24px;">✓</span>
-      6/6 validation checks passed · All within tolerance · Reproducible with SeedRandom[42]
-    </div>
-    <p style="margin-top:12px; color:#64748b; font-size:13px;">Automated proof_audit.wls script runs 18 checks across 7 audit categories (physics consistency, scaling, reproducibility).</p>
-  </div>
-</div>
-
-<!-- ========== SLIDE 15: INTERACTIVE DASHBOARD ========== -->
-<div class="slide slide-purple">
-  <div class="glow-orb glow-purple" style="width:350px;height:350px;top:-80px;left:-80px;"></div>
-  <div class="slide-content fade-group">
-    <h2>The Interactive Dashboard</h2>
-    <div class="sep" style="background:linear-gradient(90deg,#a855f7,#c084fc);"></div>
-    <p style="margin-bottom:20px; color:#94a3b8;">Section 10 of the notebook: a live <strong>Manipulate</strong> control with 4 parameters:</p>
-    <div class="grid-2">
-      <div class="card card-purple">
-        <h3 style="font-size:16px;">🎛️ Controls</h3>
-        <table class="data-table" style="margin-top:8px;">
-          <tr><td><strong>Tags on pallet</strong></td><td>4 — 64</td></tr>
-          <tr><td><strong>Forklift speed</strong></td><td>0.3 — 3.0 m/s</td></tr>
-          <tr><td><strong>Door width</strong></td><td>1.0 — 4.0 m</td></tr>
-          <tr><td><strong>PHY Mode</strong></td><td>LE 1M / LE 2M</td></tr>
-        </table>
-      </div>
-      <div class="card card-purple">
-        <h3 style="font-size:16px;">📊 Live Outputs</h3>
-        <ul class="purple" style="font-size:13px;">
-          <li><strong>Read Rate %</strong> — color-coded (green/orange/red)</li>
-          <li><strong>Dwell Time</strong> — time pallet is in aperture</li>
-          <li><strong>RF Power</strong> — self-powered or needs battery</li>
-          <li><strong>Bar chart</strong> — read vs missed distribution</li>
-        </ul>
-      </div>
-    </div>
-    <div class="card" style="margin-top:20px; text-align:center; border-color:rgba(168,85,247,0.4);">
-      <p style="font-size:clamp(14px,1.5vw,20px); color:#c084fc; font-weight:600;">Also: 3D surface plot (Section 11) showing read rate across the full tags × speed design space</p>
-      <p style="color:#64748b; margin-top:8px; font-size:13px;">White mesh lines mark the 80% and 95% thresholds — instantly showing the "safe zone" for deployment</p>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 16: WHAT WE LEARNED ========== -->
-<div class="slide slide-dark">
-  <div class="slide-content fade-group">
-    <h2>What We <span class="accent-cyan">Learned</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#06b6d4,#22d3ee);"></div>
-    <div class="grid-2">
-      <div>
-        <h3 class="accent-cyan" style="margin-bottom:12px;">Technical Insights</h3>
-        <ul style="font-size:14px;">
-          <li><strong>BLE data channels change everything</strong> — advertising-only backscatter was a dead end for supply chain (15 kbps max)</li>
-          <li><strong>ASIC vs COTS is a 50× gap</strong> — 9.9 µW vs 491 µW determines whether RF harvesting is feasible</li>
-          <li><strong>Multi-tag scaling is the bottleneck</strong> — TDD scheduling limits practical deployments to ~32 tags per excitation source</li>
-          <li><strong>Distance and speed are coupled</strong> — wider doors or slower speed buy proportional dwell time</li>
-        </ul>
-      </div>
-      <div>
-        <h3 class="accent-orange" style="margin-bottom:12px;">Process Insights</h3>
-        <ul class="orange" style="font-size:14px;">
-          <li><strong>Paper → Product in one session</strong> — the Amp workflow compressed weeks of R&D exploration into hours</li>
-          <li><strong>Validation is non-negotiable</strong> — every model claim is spot-checked against paper data with tolerances</li>
-          <li><strong>Interactive controls reveal limits</strong> — the Manipulate exposed the 64-tag / 2 m/s cliff before any physical prototype</li>
-          <li><strong>Reusable packages compound value</strong> — PassiveBLE.wl can power future simulations without rebuilding</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 17: WHAT WAS ACHIEVED ========== -->
-<div class="slide slide-green">
-  <div class="glow-orb glow-green" style="width:400px;height:400px;top:-100px;right:-100px;"></div>
-  <div class="slide-content fade-group">
-    <h2>What Was <span class="accent-green">Achieved</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#22c55e,#4ade80);"></div>
-    <div class="grid-2">
-      <div>
-        <h3 class="accent-green">Deliverables</h3>
-        <div class="card" style="margin-top:12px; margin-bottom:10px;">
-          <strong>PassiveBLE.wl</strong> — 16-function reusable package
-        </div>
-        <div class="card" style="margin-bottom:10px;">
-          <strong>PassiveBLE_WiliotDemo.nb</strong> — 13-section notebook
-        </div>
-        <div class="card" style="margin-bottom:10px;">
-          <strong>proof_audit.wls</strong> — 18-check verification
-        </div>
-        <div class="card">
-          <strong>README.md</strong> — full documentation + API reference
-        </div>
-      </div>
-      <div>
-        <h3 class="accent">By the Numbers</h3>
-        <div class="grid-2" style="margin-top:12px;">
-          <div class="card" style="text-align:center;">
-            <div class="big-num accent" style="font-size:36px;">5</div>
-            <div class="metric-label">Papers Reviewed</div>
-          </div>
-          <div class="card" style="text-align:center;">
-            <div class="big-num accent-green" style="font-size:36px;">16</div>
-            <div class="metric-label">Functions Built</div>
-          </div>
-          <div class="card" style="text-align:center;">
-            <div class="big-num accent-purple" style="font-size:36px;">13</div>
-            <div class="metric-label">Notebook Sections</div>
-          </div>
-          <div class="card" style="text-align:center;">
-            <div class="big-num accent-orange" style="font-size:36px;">6/6</div>
-            <div class="metric-label">Validations Passed</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="verdict verdict-pass" style="margin-top:16px;">
-      <span style="font-size:24px;">🎯</span>
-      Complete paper-to-product pipeline: one MobiCom paper → executable simulation → interactive product demo
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 18: THE BENEFIT ========== -->
-<div class="slide slide-orange">
-  <div class="glow-orb" style="width:400px;height:400px;background:#f59e0b;bottom:-100px;left:-100px;"></div>
-  <div class="slide-content fade-group">
-    <h2>The <span class="accent-orange">Benefit</span></h2>
-    <div class="sep" style="background:linear-gradient(90deg,#f59e0b,#fb923c);"></div>
-    <div class="grid-3">
-      <div class="card card-orange">
-        <h3 style="text-align:center; font-size:32px; margin-bottom:8px;">⏱️</h3>
-        <h3 style="text-align:center; color:#fb923c;">Speed</h3>
-        <p style="text-align:center; font-size:13px;">From paper discovery to executable product simulation in <strong>one AI session</strong> — not weeks of manual R&D</p>
-      </div>
-      <div class="card card-green">
-        <h3 style="text-align:center; font-size:32px; margin-bottom:8px;">🔬</h3>
-        <h3 style="text-align:center; color:#4ade80;">Rigor</h3>
-        <p style="text-align:center; font-size:13px;">Every result <strong>validated against paper data</strong> — 18 automated audit checks, 6/6 metrics pass</p>
-      </div>
-      <div class="card card-purple">
-        <h3 style="text-align:center; font-size:32px; margin-bottom:8px;">🔁</h3>
-        <h3 style="text-align:center; color:#c084fc;">Reusability</h3>
-        <p style="text-align:center; font-size:13px;">PassiveBLE.wl is a <strong>permanent asset</strong> — any future simulation can import and extend it</p>
-      </div>
-    </div>
-    <div class="grid-2" style="margin-top:20px;">
-      <div class="card">
-        <h3 class="accent" style="font-size:15px;">For Wiliot's Engineering Team</h3>
-        <ul style="font-size:13px;">
-          <li>Explore the design space <em>before</em> building hardware</li>
-          <li>Quantify limits: max tags, min speed, feasible distances</li>
-          <li>Present to stakeholders with interactive dashboards</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 class="accent-orange" style="font-size:15px;">For Wiliot's Business Team</h3>
-        <ul class="orange" style="font-size:13px;">
-          <li>Translate research papers into product opportunities in hours</li>
-          <li>Make data-driven decisions on which technologies to pursue</li>
-          <li>De-risk R&D investment with simulation-first approach</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 19: THE COMPLETE PROCESS ========== -->
-<div class="slide slide-blue">
-  <div class="glow-orb glow-blue" style="width:350px;height:350px;top:-80px;left:-80px;"></div>
-  <div class="glow-orb glow-purple" style="width:300px;height:300px;bottom:-60px;right:-60px;"></div>
-  <div class="slide-content fade-group">
-    <h2>The Complete Process: <span class="accent">End to End</span></h2>
-    <div class="sep"></div>
-    <div style="display:flex; flex-direction:column; gap:10px;">
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="step-num">1</span>
-        <div class="card" style="flex:1; padding:12px 18px;">
-          <strong>Research Curation</strong> — Scanned arXiv, IEEE, ACM for BLE backscatter papers (2024-2026). Selected 5 candidates ranked by Wiliot relevance.
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="step-num" style="background:linear-gradient(135deg,#22c55e,#16a34a);">2</span>
-        <div class="card" style="flex:1; padding:12px 18px;">
-          <strong>Deep Paper Analysis</strong> — Extracted all quantitative results: 974 kbps, 9.9 µW, 99.9% connection, 17 m range, 93 ns sync.
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="step-num" style="background:linear-gradient(135deg,#a855f7,#7c3aed);">3</span>
-        <div class="card" style="flex:1; padding:12px 18px;">
-          <strong>Commercial Ideation</strong> — Generated 4 product concepts. Selected "Dock-Door Fast Read" as hero demo for Wiliot.
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="step-num" style="background:linear-gradient(135deg,#f59e0b,#d97706);">4</span>
-        <div class="card" style="flex:1; padding:12px 18px;">
-          <strong>Simulation Build</strong> — Created PassiveBLE.wl (16 functions) + PassiveBLE_WiliotDemo.nb (13 sections, 6 viz types).
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="step-num" style="background:linear-gradient(135deg,#ef4444,#dc2626);">5</span>
-        <div class="card" style="flex:1; padding:12px 18px;">
-          <strong>Validation & Audit</strong> — 6/6 paper metrics matched. 18 automated checks passed. Reproducible (SeedRandom[42]).
-        </div>
-      </div>
-      <div style="display:flex; align-items:center; gap:14px;">
-        <span class="step-num" style="background:linear-gradient(135deg,#06b6d4,#0891b2);">6</span>
-        <div class="card" style="flex:1; padding:12px 18px;">
-          <strong>Delivery</strong> — 4 files, full README with API docs, ready to open in Mathematica and present to Wiliot.
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== SLIDE 20: CLOSING ========== -->
-<div class="slide slide-final">
-  <div class="glow-orb glow-blue" style="width:500px;height:500px;top:-150px;right:-150px;"></div>
-  <div class="glow-orb glow-purple" style="width:400px;height:400px;bottom:-100px;left:-100px;"></div>
-  <div class="glow-orb glow-green" style="width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);"></div>
-  <div class="slide-content" style="text-align:center;">
-    <h1 style="margin-bottom:24px;">One Paper.<br><span class="accent">One Workflow.</span><br><span class="accent-green">One Product Simulation.</span></h1>
-    <div class="sep" style="margin:24px auto; width:100px;"></div>
-    <p style="font-size:clamp(16px,1.8vw,24px); color:#94a3b8; max-width:700px; margin:0 auto 32px;">Amp turned a MobiCom 2025 research paper into a validated, interactive product simulation — with reusable code, automated verification, and a clear path to Wiliot's next product.</p>
-    <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
-      <span class="tag tag-blue" style="font-size:14px; padding:8px 20px;">PassiveBLE.wl</span>
-      <span class="tag tag-green" style="font-size:14px; padding:8px 20px;">13-Section Notebook</span>
-      <span class="tag tag-purple" style="font-size:14px; padding:8px 20px;">18 Audit Checks</span>
-      <span class="tag tag-orange" style="font-size:14px; padding:8px 20px;">6/6 Validated</span>
-    </div>
-    <p style="color:#475569; margin-top:40px; font-size:14px;">PassiveBLE × Wiliot Demo &middot; Built with Amp &middot; April 2026</p>
-  </div>
-</div>
-
-</div><!-- /slides-container -->
-
-<!-- Navigation -->
-<button class="nav-btn nav-prev" id="prevBtn" onclick="navigate(-1)">&#8249;</button>
-<button class="nav-btn nav-next" id="nextBtn" onclick="navigate(1)">&#8250;</button>
-<div class="progress-bar" id="progressBar"></div>
-<div class="slide-counter" id="slideCounter">1 / 20</div>
-<div class="swipe-hint" id="swipeHint">&#8592; Swipe to navigate &#8594;</div>
+<button class="nb np" id="pb" onclick="nav(-1)">&#8249;</button>
+<button class="nb nn" id="nb" onclick="nav(1)">&#8250;</button>
+<div class="pb" id="pr"></div>
+<div class="sc-c" id="ct">1 / 21</div>
+<div class="sh" id="sh">&#8592; Swipe to navigate &#8594;</div>
 
 <script>
-let current = 0;
-const total = document.querySelectorAll('.slide').length;
-const container = document.getElementById('slidesContainer');
-let touchStartX = 0, touchEndX = 0, mouseStartX = 0, mouseDown = false, hintShown = true;
-
-function goTo(index) {
-  current = Math.max(0, Math.min(index, total - 1));
-  container.style.transform = `translateX(-${current * 100}vw)`;
-  document.getElementById('prevBtn').style.display = current === 0 ? 'none' : 'flex';
-  document.getElementById('nextBtn').style.display = current === total - 1 ? 'none' : 'flex';
-  document.getElementById('progressBar').style.width = `${((current + 1) / total) * 100}%`;
-  document.getElementById('slideCounter').textContent = `${current + 1} / ${total}`;
-  if (hintShown) { document.getElementById('swipeHint').style.opacity = '0'; hintShown = false; }
-}
-
-function navigate(dir) { goTo(current + dir); }
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); navigate(1); }
-  if (e.key === 'ArrowLeft') { e.preventDefault(); navigate(-1); }
-});
-
-document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, false);
-document.addEventListener('touchend', e => {
-  touchEndX = e.changedTouches[0].screenX;
-  const diff = touchStartX - touchEndX;
-  if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
-}, false);
-
-document.addEventListener('mousedown', e => { mouseDown = true; mouseStartX = e.screenX; });
-document.addEventListener('mouseup', e => {
-  if (!mouseDown) return;
-  mouseDown = false;
-  const diff = mouseStartX - e.screenX;
-  if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
-});
-
-goTo(0);
+let c=0;const t=document.querySelectorAll('.s').length,cn=document.getElementById('sc');
+let ts=0,te=0,ms=0,md=false,hs=true;
+function go(i){c=Math.max(0,Math.min(i,t-1));cn.style.transform=`translateX(-${c*100}vw)`;
+document.getElementById('pb').style.display=c===0?'none':'flex';
+document.getElementById('nb').style.display=c===t-1?'none':'flex';
+document.getElementById('pr').style.width=`${((c+1)/t)*100}%`;
+document.getElementById('ct').textContent=`${c+1} / ${t}`;
+if(hs){document.getElementById('sh').style.opacity='0';hs=false;}}
+function nav(d){go(c+d)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();nav(1)}if(e.key==='ArrowLeft'){e.preventDefault();nav(-1)}});
+document.addEventListener('touchstart',e=>{ts=e.changedTouches[0].screenX},false);
+document.addEventListener('touchend',e=>{te=e.changedTouches[0].screenX;const d=ts-te;if(Math.abs(d)>50)nav(d>0?1:-1)},false);
+document.addEventListener('mousedown',e=>{md=true;ms=e.screenX});
+document.addEventListener('mouseup',e=>{if(!md)return;md=false;const d=ms-e.screenX;if(Math.abs(d)>50)nav(d>0?1:-1)});
+go(0);
 </script>
 </body>
 </html>
