@@ -74,8 +74,8 @@ ReceivedPower[pTx_?NumericQ, gTx_?NumericQ, gRx_?NumericQ,
 (* === Wake-Up Model === *)
 (* Logistic fit to paper data: steep transition around -30 dBm *)
 
-wakeUpLogisticK = 2.5;   (* steepness *)
-wakeUpLogisticX0 = -30.3; (* midpoint dBm *)
+wakeUpLogisticK = 3.5;   (* steepness *)
+wakeUpLogisticX0 = -30.5; (* midpoint dBm *)
 
 WakeUpProbability[pRx_?NumericQ] :=
   N[1.0 / (1.0 + Exp[-wakeUpLogisticK (pRx - wakeUpLogisticX0)])]
